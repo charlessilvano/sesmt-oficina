@@ -1,6 +1,6 @@
-# Gerador de SST para Condomínios
+# Gerador de SST para Oficinas e Centros Automotivos
 
-Versão 4, completa e compatível com GitHub Pages, do aplicativo PWA para preparar documentos de Saúde e Segurança do Trabalho de condomínios. O fluxo reúne PGR, relatório psicossocial da NR-01, PCMSO e LTCAT, com geração dos arquivos em Word (`.docx`) diretamente no navegador.
+Versão 4, completa e compatível com GitHub Pages, do aplicativo PWA para preparar documentos de Saúde e Segurança do Trabalho de oficinas mecânicas e centros automotivos. O fluxo reúne PGR, relatório psicossocial da NR-01, PCMSO e LTCAT, com geração dos arquivos em Word (`.docx`) diretamente no navegador.
 
 ## Publicação no GitHub Pages
 
@@ -32,19 +32,19 @@ pnpm preview
 
 ## Recursos incluídos
 
-- seleção dos condomínios do documento-base;
+- cadastro da oficina ou centro automotivo (perfil personalizado) e 4 Macro-GHEs: manutenção eletromecânica; funilaria, soldagem e pintura; apoio e lubrificação; gestão e administrativo;
 - configuração do quadro de funcionários por cargo e GHE;
 - checklist de atividades, ambientes e exposições;
 - inventário de riscos com matriz qualitativa 6 × 4;
 - EPIs, treinamentos, inspeções e plano de ação;
 - importação local do CSV de respostas da NR-01;
-- vinculação automática por nome ou CNPJ do condomínio;
+- vinculação automática por nome ou CNPJ da oficina;
 - indicadores por domínio, questões prioritárias e plano de ação psicossocial;
 - proteção de resultados detalhados quando houver menos de três respostas;
 - inclusão do relatório NR-01 como anexo no mesmo arquivo Word do PGR;
 - elaboração prioritária do PCMSO a partir dos cargos e riscos configurados no PGR;
 - protocolos médicos por função, com a descrição da atividade idêntica à do PGR e todos os riscos detalhados por natureza, fonte, agravos e situação;
-- matriz de 423 vínculos função–exame extraídos da planilha de referência, cobrindo 25 funções e 32 exames ou avaliações;
+- matriz de vínculos função–exame para os 13 cargos de oficina, sobre o catálogo de 32 exames ou avaliações, sujeita à validação do médico coordenador do PCMSO;
 - detalhamento dos eventos admissional, seis meses após admissão, periódico, mudança de risco, retorno ao trabalho e demissional;
 - distinção explícita entre exame-base, condicional ao risco, indicação individual, cenário não caracterizado, cuidado pós-exposição e parte do exame clínico;
 - campos do médico responsável, CRM, RQE, clínica, vigência, vacinação e relatório analítico;
@@ -67,3 +67,7 @@ pnpm preview
 ## Nota técnica
 
 Os arquivos gerados são minutas estruturadas. Cargos, ambientes, atividades, exposições, controles e enquadramentos legais devem ser confirmados em campo. O PGR exige validação do responsável técnico; o PCMSO exige revisão e assinatura do médico responsável; e o LTCAT exige inspeção e assinatura de médico do trabalho ou engenheiro de segurança legalmente habilitado. O questionário fornecido é tratado como instrumento personalizado de consulta e triagem coletiva, não como aplicação integral do HSE Indicator Tool.
+
+## Adaptação para oficinas
+
+Esta versão do gerador foi adaptada a partir do `sesmt` (condomínios). Cargos, GHEs, riscos, cenários, áreas, plano de ação, referências normativas e matriz de exames foram substituídos pelos de oficina mecânica. Os dados salvos no navegador usam o prefixo `oficina-sst-v1:`, sem conflito com a versão de condomínios. Os CBOs informados foram conferidos na tabela oficial; limites de tolerância e códigos eSocial não são fixados no catálogo e devem ser confirmados pelo responsável técnico e pelo médico coordenador.

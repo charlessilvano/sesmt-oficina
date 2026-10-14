@@ -217,7 +217,7 @@ function cover(
       [
         ["CNPJ", text(state.cnpj)],
         ["Endereço", [text(state.address, ""), text(state.cityState, "")].filter(Boolean).join(" – ") || "Não informado"],
-        ["Empresa prestadora", text(state.contractingCompany, "GRUPO DINAMIZZA")],
+        ["Empresa", text(state.contractingCompany, "Não informada")],
         ["Data-base", date(state.issueDate)],
       ],
       [32, 68],
@@ -839,7 +839,7 @@ function filename(value: string) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
-    .toLowerCase() || "condominio";
+    .toLowerCase() || "oficina";
 }
 
 function triggerDownload(blob: Blob, name: string) {
@@ -854,11 +854,11 @@ function triggerDownload(blob: Blob, name: string) {
 }
 
 export function makePcmsoFilename(state: PgrState) {
-  return `PCMSO-${filename(text(state.condoName, "condominio"))}.docx`;
+  return `PCMSO-${filename(text(state.condoName, "oficina"))}.docx`;
 }
 
 export function makeLtcatFilename(state: PgrState) {
-  return `LTCAT-${filename(text(state.condoName, "condominio"))}.docx`;
+  return `LTCAT-${filename(text(state.condoName, "oficina"))}.docx`;
 }
 
 export async function downloadPcmsoDocx(state: PgrState) {

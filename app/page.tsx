@@ -87,10 +87,10 @@ import type {
   PgrState,
 } from "./pgr-types";
 
-const STORAGE_PREFIX = "dinamizza-pgr-v1:";
-const LAST_CONDO_KEY = "dinamizza-pgr-v1:last-condo";
-const NR01_DATA_KEY = "dinamizza-pgr-v1:nr01-dataset";
-const NR01_SETTINGS_KEY = "dinamizza-pgr-v1:nr01-settings";
+const STORAGE_PREFIX = "oficina-sst-v1:";
+const LAST_CONDO_KEY = "oficina-sst-v1:last-condo";
+const NR01_DATA_KEY = "oficina-sst-v1:nr01-dataset";
+const NR01_SETTINGS_KEY = "oficina-sst-v1:nr01-settings";
 
 type Nr01Settings = {
   locationByCondo: Record<string, string>;
@@ -137,19 +137,26 @@ function todayIso() {
 
 function suggestedAreasForRoles(roleIds: string[]) {
   const ghes = new Set(roleIds.map((id) => getRole(id)?.ghe));
-  const areas = new Set<string>(["Halls e corredores", "Escadas e rampas"]);
-  if (ghes.has("GHE 01")) areas.add("Áreas administrativas");
+  const areas = new Set<string>(["Instalações sanitárias, vestiários e refeitório (NR-24)"]);
+  if (ghes.has("GHE 01")) {
+    areas.add("Pátio de manobra e estacionamento de veículos");
+    areas.add("Galpão principal – boxes de mecânica e elevadores automotivos");
+    areas.add("Setor de borracharia, alinhamento e balanceamento");
+    areas.add("Sala técnica do compressor de ar (NR-13)");
+  }
   if (ghes.has("GHE 02")) {
-    areas.add("Sanitários");
-    areas.add("Áreas externas");
+    areas.add("Setor de funilaria, chapeação e soldagem");
+    areas.add("Setor de preparação e cabine de pintura");
   }
-  if (ghes.has("GHE 03") || ghes.has("GHE 05")) areas.add("Portaria e acessos");
-  if (ghes.has("GHE 04") || ghes.has("GHE 06")) {
-    areas.add("Áreas técnicas");
-    areas.add("Locais de manutenção");
+  if (ghes.has("GHE 03")) {
+    areas.add("Box de lavagem e estética automotiva (com CSAO)");
+    areas.add("Abrigo de resíduos perigosos (óleo usado e baterias)");
   }
-  if (ghes.has("GHE 06")) areas.add("Depósitos e almoxarifados");
-  if (ghes.has("GHE 07")) areas.add("Garagens");
+  if (ghes.has("GHE 04")) {
+    areas.add("Recepção técnica e sala de espera de clientes");
+    areas.add("Almoxarifado de peças, tintas e lubrificantes");
+    areas.add("Escritório administrativo e financeiro");
+  }
   return [...areas];
 }
 
@@ -172,7 +179,7 @@ function createStateForCondo(condoId: string): PgrState {
     cnpj: condo.cnpj ?? "",
     address: "",
     cityState: "",
-    contractingCompany: "GRUPO DINAMIZZA",
+    contractingCompany: "",
     localResponsible: "",
     issueDate,
     reviewDate: "",
@@ -180,7 +187,7 @@ function createStateForCondo(condoId: string): PgrState {
     professionalTitle: "",
     professionalRegistration: "",
     environmentDescription:
-      "Condomínio ou edificação pronta e em funcionamento, com ambientes a confirmar em visita técnica quanto a ventilação, iluminação, circulação, pisos, acessos, sinalização, rotas de fuga, equipamentos de emergência e instalações elétricas.",
+      "Galpão operacional com piso industrial, ventilação natural e exaustão localizada, dividido em boxes de manutenção mecânica com elevadores automotivos, setor de funilaria e soldagem, cabine de pintura, borracharia, box de lavagem com caixa separadora de água e óleo (CSAO), almoxarifado de peças e recepção administrativa. Ambientes a confirmar em visita técnica quanto a ventilação, iluminação, circulação, pisos, acessos, sinalização, rotas de fuga, equipamentos de emergência e instalações elétricas.",
     selectedAreas: suggestedAreasForRoles(condo.suggestedRoleIds),
     notes: condo.note ?? "",
     roles,
@@ -316,7 +323,7 @@ export default function Home() {
     register({
       name: "get_pgr_summary",
       title: "Consultar resumo do PGR",
-      description: "Retorna o condomínio atual, cargos, total de trabalhadores e conferência com a referência.",
+      description: "Retorna a oficina atual, cargos, total de trabalhadores e conferência com a referência.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true, untrustedContentHint: false },
       execute: () => {
@@ -335,8 +342,8 @@ export default function Home() {
 
     register({
       name: "select_condominium",
-      title: "Selecionar condomínio",
-      description: "Abre ou inicia a configuração de um condomínio cadastrado.",
+      title: "Selecionar oficina",
+      description: "Abre ou inicia a configuração de uma oficina cadastrada.",
       inputSchema: {
         type: "object",
         properties: { condoId: { type: "string", enum: condoCatalog.map((condo) => condo.id) } },
@@ -347,7 +354,7 @@ export default function Home() {
       execute: (input) => {
         const condoId = (input as { condoId?: string }).condoId;
         const condo = condoCatalog.find((item) => item.id === condoId);
-        if (!condo) throw new Error("Condomínio não encontrado.");
+        if (!condo) throw new Error("Oficina não encontrada.");
         const next = loadState(condo.id);
         stateRef.current = next;
         setState(next);
@@ -409,7 +416,7 @@ export default function Home() {
     register({
       name: "export_pgr_docx",
       title: "Gerar PGR em Word",
-      description: "Gera e baixa o arquivo DOCX do condomínio atualmente configurado.",
+      description: "Gera e baixa o arquivo DOCX da oficina atualmente configurado.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: false, untrustedContentHint: false },
       execute: async () => {
@@ -521,7 +528,7 @@ export default function Home() {
 
   const warnings = useMemo(() => {
     const items: string[] = [];
-    if (!state.condoName.trim()) items.push("Informe o nome do condomínio.");
+    if (!state.condoName.trim()) items.push("Informe o nome da oficina.");
     if (!state.cnpj.trim()) items.push("CNPJ ainda não informado.");
     if (!state.address.trim() || !state.cityState.trim()) items.push("Complete o endereço do estabelecimento.");
     if (!selectedRoles.length) items.push("Inclua ao menos um cargo com quantidade.");
@@ -755,7 +762,7 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!state.condoName.trim()) {
       setStep(0);
-      toast.error("Informe o nome do condomínio antes de gerar o PGR.");
+      toast.error("Informe o nome da oficina antes de gerar o PGR.");
       return;
     }
     if (!selectedRoles.length) {
@@ -781,7 +788,7 @@ export default function Home() {
   const handleGeneratePcmso = async () => {
     if (!state.condoName.trim()) {
       setStep(0);
-      toast.error("Informe o nome do condomínio antes de gerar o PCMSO.");
+      toast.error("Informe o nome da oficina antes de gerar o PCMSO.");
       return;
     }
     if (!selectedRoles.length) {
@@ -811,7 +818,7 @@ export default function Home() {
   const handleGenerateLtcat = async () => {
     if (!state.condoName.trim()) {
       setStep(0);
-      toast.error("Informe o nome do condomínio antes de gerar o LTCAT.");
+      toast.error("Informe o nome da oficina antes de gerar o LTCAT.");
       return;
     }
     if (!selectedRoles.length) {
@@ -852,9 +859,9 @@ export default function Home() {
       <section className="section-card featured-card">
         <div className="field-grid field-grid-2">
           <div className="field-span-2">
-            <FieldLabel>Condomínio ou estabelecimento</FieldLabel>
+            <FieldLabel>Oficina ou centro automotivo</FieldLabel>
             <Select value={state.condoId} onValueChange={selectCondo}>
-              <SelectTrigger className="select-large"><SelectValue placeholder="Selecione o condomínio" /></SelectTrigger>
+              <SelectTrigger className="select-large"><SelectValue placeholder="Selecione a oficina / empresa" /></SelectTrigger>
               <SelectContent position="popper" className="max-w-[min(92vw,620px)]">
                 {condoCatalog.map((condo) => <SelectItem key={condo.id} value={condo.id}>{condo.name}</SelectItem>)}
               </SelectContent>
@@ -882,7 +889,7 @@ export default function Home() {
           </div>
           <div>
             <FieldLabel htmlFor="local-responsible">Responsável local</FieldLabel>
-            <Input id="local-responsible" value={state.localResponsible} onChange={(event) => update("localResponsible", event.target.value)} placeholder="Nome do síndico ou gestor" />
+            <Input id="local-responsible" value={state.localResponsible} onChange={(event) => update("localResponsible", event.target.value)} placeholder="Nome do proprietário ou gestor" />
           </div>
           <div>
             <FieldLabel htmlFor="provider">Empresa prestadora</FieldLabel>
@@ -933,7 +940,7 @@ export default function Home() {
                   return (
                     <div className={`role-row ${selection?.selected ? "role-selected" : ""}`} key={role.id}>
                       <Checkbox id={`role-${role.id}`} checked={selection?.selected ?? false} onCheckedChange={(checked) => updateRole(role.id, { selected: checked === true })} aria-label={`Incluir ${role.name}`} />
-                      <label htmlFor={`role-${role.id}`} className="role-name"><strong>{role.name}</strong><span>{suggested ? "Indicado na referência" : role.gheName}</span></label>
+                      <label htmlFor={`role-${role.id}`} className="role-name"><strong>{role.name}</strong><span>{suggested ? "Sugerido para o perfil" : role.gheName}</span></label>
                       <div className="quantity-control" aria-label={`Quantidade de ${role.name}`}>
                         <Button type="button" variant="ghost" size="icon-sm" onClick={() => updateRole(role.id, { quantity: Math.max(0, (selection?.quantity ?? 0) - 1) })} disabled={!selection?.selected || (selection?.quantity ?? 0) === 0} aria-label="Diminuir quantidade"><Minus /></Button>
                         <Input type="number" min={0} max={999} value={selection?.quantity ?? 0} onChange={(event) => updateRole(role.id, { quantity: Number(event.target.value) })} disabled={!selection?.selected} aria-label={`Quantidade de ${role.name}`} />
@@ -968,7 +975,7 @@ export default function Home() {
         <div className="scenario-grid">
           {scenarioCatalog.map((scenario) => {
             const checked = state.scenarios[scenario.id];
-            const highAttention = scenario.id === "eletricidade" || scenario.id === "trabalhoAltura" || scenario.id === "segurancaPatrimonial";
+            const highAttention = ["eletricidade", "trabalhoAltura", "elevadores", "compressor", "cabinePintura", "soldagem", "borracharia"].includes(scenario.id);
             return (
               <label key={scenario.id} className={`scenario-card ${checked ? "scenario-selected" : ""}`}>
                 <div className="scenario-top"><Checkbox checked={checked} onCheckedChange={(value) => toggleScenario(scenario.id, value === true)} /><span className="scenario-label">{scenario.label}</span>{highAttention && <StatusPill tone="high">atenção</StatusPill>}</div>
@@ -1090,7 +1097,7 @@ export default function Home() {
       )}
 
       {nr01Dataset && !nr01Report && (
-        <section className="empty-state section-card"><BarChart3 aria-hidden="true" /><h2>Selecione um local do CSV</h2><p>Escolha o local correspondente ao condomínio para calcular os indicadores.</p></section>
+        <section className="empty-state section-card"><BarChart3 aria-hidden="true" /><h2>Selecione um local do CSV</h2><p>Escolha o local correspondente à oficina para calcular os indicadores.</p></section>
       )}
 
       {nr01Report && !nr01Report.canPublishDetailedResults && (
@@ -1157,7 +1164,7 @@ export default function Home() {
       <section className="section-card">
         <label className={`module-toggle-card ${state.pcmso.included ? "module-toggle-active" : ""}`}>
           <Checkbox checked={state.pcmso.included} onCheckedChange={(checked) => updatePcmso("included", checked === true)} />
-          <span><strong>Incluir PCMSO no processo deste condomínio</strong><small>O documento será gerado separadamente em Word e permanecerá vinculado ao mesmo PGR.</small></span>
+          <span><strong>Incluir PCMSO no processo desta oficina</strong><small>O documento será gerado separadamente em Word e permanecerá vinculado ao mesmo PGR.</small></span>
           <StatusPill tone={pcmsoReadiness === 100 ? "ok" : "warn"}>{pcmsoReadiness === 100 ? "Cadastro completo" : "Completar cadastro"}</StatusPill>
         </label>
       </section>
@@ -1235,7 +1242,7 @@ export default function Home() {
 
       <section className="module-export-card pcmso-export-card">
         <div className="export-document-icon"><HeartPulse /></div>
-        <div className="export-copy"><span className="eyebrow">Documento prioritário</span><h2>PCMSO de {state.condoName || "condomínio"}</h2><p>{pcmsoProtocolRows.length} função(ões), {pcmsoExamCount} vínculo(s) de exames, riscos, atividades, ASO, prontuários e relatório analítico anual.</p><div className="export-tags"><span>Word editável</span><span>Integrado ao PGR</span><span>Revisão médica obrigatória</span></div></div>
+        <div className="export-copy"><span className="eyebrow">Documento prioritário</span><h2>PCMSO da Oficina {state.condoName || "oficina"}</h2><p>{pcmsoProtocolRows.length} função(ões), {pcmsoExamCount} vínculo(s) de exames, riscos, atividades, ASO, prontuários e relatório analítico anual.</p><div className="export-tags"><span>Word editável</span><span>Integrado ao PGR</span><span>Revisão médica obrigatória</span></div></div>
         <Button className="export-button" size="lg" onClick={handleGeneratePcmso} disabled={isGenerating || !selectedRoles.length}>{generatingDocument === "pcmso" ? <Sparkles className="animate-pulse" /> : <Download />}{generatingDocument === "pcmso" ? "Montando PCMSO..." : "Gerar PCMSO em Word"}</Button>
       </section>
     </div>
@@ -1251,7 +1258,7 @@ export default function Home() {
       <section className="section-card">
         <label className={`module-toggle-card ${state.ltcat.included ? "module-toggle-active" : ""}`}>
           <Checkbox checked={state.ltcat.included} onCheckedChange={(checked) => updateLtcat("included", checked === true)} />
-          <span><strong>Incluir LTCAT no processo deste condomínio</strong><small>Todas as funções serão incluídas, mesmo quando não houver agente nocivo inicialmente caracterizado.</small></span>
+          <span><strong>Incluir LTCAT no processo desta oficina</strong><small>Todas as funções serão incluídas, mesmo quando não houver agente nocivo inicialmente caracterizado.</small></span>
           <StatusPill tone={totalLtcatPending ? "warn" : "ok"}>{totalLtcatPending ? `${totalLtcatPending} pendência(s)` : "Avaliações preenchidas"}</StatusPill>
         </label>
         <div className="notice notice-amber"><AlertTriangle aria-hidden="true" /><div><strong>Sem conclusão automática</strong><p>O LTCAT deve registrar todas as funções e verificar se existe exposição a agentes prejudiciais à saúde. A conclusão continua reservada ao médico do trabalho ou engenheiro de segurança do trabalho.</p></div></div>
@@ -1342,7 +1349,7 @@ export default function Home() {
 
       <section className="module-export-card">
         <div className="export-document-icon"><FileSearch /></div>
-        <div className="export-copy"><span className="eyebrow">Documento previdenciário</span><h2>LTCAT de {state.condoName || "condomínio"}</h2><p>{ltcatFunctionRows.length} função(ões), {ltcatExposureRows.length} agente(s) potencial(is) e {totalLtcatPending} avaliação(ões) pendente(s).</p><div className="export-tags"><span>Todas as funções incluídas</span><span>Base para conferência do PPP</span><span>Assinatura técnica obrigatória</span></div></div>
+        <div className="export-copy"><span className="eyebrow">Documento previdenciário</span><h2>LTCAT da Oficina {state.condoName || "oficina"}</h2><p>{ltcatFunctionRows.length} função(ões), {ltcatExposureRows.length} agente(s) potencial(is) e {totalLtcatPending} avaliação(ões) pendente(s).</p><div className="export-tags"><span>Todas as funções incluídas</span><span>Base para conferência do PPP</span><span>Assinatura técnica obrigatória</span></div></div>
         <Button className="export-button" size="lg" onClick={handleGenerateLtcat} disabled={isGenerating || !selectedRoles.length}>{generatingDocument === "ltcat" ? <Sparkles className="animate-pulse" /> : <Download />}{generatingDocument === "ltcat" ? "Montando LTCAT..." : "Gerar LTCAT em Word"}</Button>
       </section>
     </div>
@@ -1373,7 +1380,7 @@ export default function Home() {
         </div>
       </section>
       <section className="section-card">
-        <div className="section-heading"><div><span className="eyebrow">Central de documentos</span><h2>Arquivos Word do condomínio</h2></div><p>Cada arquivo mantém seus próprios responsáveis e critérios de validação.</p></div>
+        <div className="section-heading"><div><span className="eyebrow">Central de documentos</span><h2>Arquivos Word da oficina</h2></div><p>Cada arquivo mantém seus próprios responsáveis e critérios de validação.</p></div>
         <div className="document-grid">
           <article className="document-card">
             <div className="document-card-icon"><FileCheck2 /></div>
@@ -1404,7 +1411,7 @@ export default function Home() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand-block"><div className="brand-mark" aria-hidden="true"><FileText /></div><div><strong>Gerador de SST</strong><span>PGR · PCMSO · LTCAT · Grupo Dinamizza</span></div></div>
+        <div className="brand-block"><div className="brand-mark" aria-hidden="true"><FileText /></div><div><strong>Gerador de SST</strong><span>PGR · PCMSO · LTCAT · Oficinas</span></div></div>
         <div className="topbar-actions">
           <span className={`connection-state ${isOnline ? "online" : "offline"}`}>{isOnline ? <Wifi /> : <WifiOff />}{isOnline ? "Salvo neste dispositivo" : "Modo offline ativo"}</span>
           {installPrompt && <Button variant="outline" onClick={handleInstall}><Download /> Instalar app</Button>}

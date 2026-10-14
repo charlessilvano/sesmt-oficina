@@ -246,7 +246,7 @@ function defaultPcmsoProtocol(state: PgrState, role: RoleDefinition): PcmsoRoleP
   if (allText.includes("ergonom")) {
     clinical.push("Avaliação de sintomas osteomusculares, mobilidade, postura e limitações funcionais");
   }
-  if (allText.includes("psicossocial") || state.scenarios.trabalhoNoturno) {
+  if (allText.includes("psicossocial")) {
     clinical.push("Investigação clínica de sono, fadiga, estresse e sinais de sofrimento psíquico, com encaminhamento quando indicado");
   }
   if (allText.includes("quimic") || allText.includes("gases")) {

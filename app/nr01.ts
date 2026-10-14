@@ -213,7 +213,7 @@ const domainDefinitions: Array<{
     description: "Conflitos com o público, trabalho isolado, apoio imediato e clareza para agir.",
     riskFactor: "Conflitos, isolamento e insuficiência de orientação ou apoio",
     actions: [
-      "Definir protocolos para conflitos com moradores, visitantes e prestadores.",
+      "Definir protocolos para conflitos com clientes, visitantes e prestadores.",
       "Garantir meios de comunicação e apoio imediato em emergências ou trabalho isolado.",
       "Clarificar responsabilidades, autonomia e fluxo de escalonamento à supervisão.",
     ],

@@ -254,7 +254,7 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
       spacing: { after: 120 },
     }),
     new Paragraph({
-      children: [new TextRun({ text: "Serviços terceirizados em condomínios e edificações prontas", bold: true, size: 26 })],
+      children: [new TextRun({ text: "Serviços de manutenção, reparação mecânica, funilaria e pintura automotiva", bold: true, size: 26 })],
       alignment: AlignmentType.CENTER,
       spacing: { after: 180 },
     }),
@@ -269,7 +269,7 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
         ["Estabelecimento", text(state.condoName)],
         ["CNPJ", text(state.cnpj)],
         ["Endereço", [text(state.address), text(state.cityState, "")].filter(Boolean).join(" – ") || "Não informado"],
-        ["Empresa prestadora", text(state.contractingCompany, "GRUPO DINAMIZZA")],
+        ["Empresa", text(state.contractingCompany, "Não informada")],
         ["Data de emissão", formatDate(state.issueDate)],
         ["Revisão prevista", formatDate(state.reviewDate)],
       ],
@@ -300,7 +300,7 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
         ["Endereço", text(state.address)],
         ["Cidade e UF", text(state.cityState)],
         ["Responsável local", text(state.localResponsible)],
-        ["Empresa prestadora", text(state.contractingCompany, "GRUPO DINAMIZZA")],
+        ["Empresa", text(state.contractingCompany, "Não informada")],
         ["Trabalhadores incluídos", String(totalWorkers)],
       ],
       [31, 69],
@@ -461,14 +461,19 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
     ["Todos", "Quedas e circulação", "Manter pisos, escadas e rotas seguras; corrigir irregularidades; sinalizar piso molhado; manter iluminação e desobstrução.", "Inspeções, sinalização e manutenção preventiva"],
     ["Todos", "Ergonomia", "Adequar mobiliário, posturas, pausas, métodos e organização do trabalho conforme a avaliação ergonômica.", "AEP e AET quando indicada"],
   ];
-  if (state.scenarios.produtosQuimicos) preventionRows.push(["Limpeza e manutenção", "Produtos químicos", "Manter produtos identificados, armazenados e acompanhados de FDS; proibir misturas incompatíveis.", "Treinamento, ventilação e EPI compatível"]);
-  if (state.scenarios.sanitariosResiduos) preventionRows.push(["Limpeza", "Biológicos", "Definir procedimentos para sanitários e resíduos, higiene das mãos, acondicionamento e descarte.", "Luvas, óculos, calçado e recursos adequados"]);
-  if (state.scenarios.circulacaoVeiculos) preventionRows.push(["Portaria e garagem", "Veículos", "Separar fluxos quando possível, sinalizar acessos e orientar manobras.", "Alta visibilidade e inspeção de acessos"]);
-  if (state.scenarios.segurancaPatrimonial) preventionRows.push(["Controle patrimonial", "Violência", "Adotar protocolos de acesso, comunicação e emergência; evitar confronto físico.", "Treinamento e meios de comunicação"]);
-  if (state.scenarios.eletricidade) preventionRows.push(["Zeladoria e manutenção", "Eletricidade", "Somente pessoal autorizado; priorizar desenergização, bloqueio e ferramentas adequadas.", "Controles e capacitação da NR-10"]);
-  if (state.scenarios.trabalhoAltura) preventionRows.push(["Zeladoria e manutenção", "Altura", "Eliminar a exposição quando possível, planejar a atividade e adotar proteção coletiva e individual.", "Análise de risco, PT e NR-35 quando aplicáveis"]);
-  if (state.scenarios.ferramentas) preventionRows.push(["Zeladoria e manutenção", "Ferramentas", "Inspecionar antes do uso, manter, guardar e utilizar conforme o fabricante.", "Checklist e EPI conforme risco"]);
-  if (state.scenarios.garagemFechada) preventionRows.push(["Garagem", "Ruído e gases", "Manter ventilação, controlar circulação e avaliar exposição quando relevante.", "Inspeção e avaliação ambiental"]);
+  if (state.scenarios.produtosQuimicos) preventionRows.push(["GHE 02, 03 e 04", "Produtos químicos", "Manter produtos identificados, armazenados e acompanhados de FDS; proibir misturas incompatíveis e reutilização de embalagens.", "Treinamento, ventilação e EPI compatível"]);
+  if (state.scenarios.elevadores) preventionRows.push(["GHE 01", "Elevadores, macacos e cavaletes", "Usar trava mecânica, respeitar a capacidade, inspecionar periodicamente e proibir permanência sob carga sem apoio seguro.", "Checklist, manutenção e NR-12"]);
+  if (state.scenarios.cabinePintura) preventionRows.push(["GHE 02", "Cabine de pintura e solventes", "Manter exaustão e filtros, controlar fontes de ignição na sala de mistura, armazenar inflamáveis em local adequado e usar proteção respiratória compatível.", "Avaliação quantitativa, FDS, NR-15 e NR-20"]);
+  if (state.scenarios.soldagem) preventionRows.push(["GHE 02", "Soldagem, corte e esmerilhamento", "Usar exaustão localizada, biombos, permissão para trabalho a quente e remoção de materiais combustíveis.", "Máscara de soldagem, respirador, vestimenta de raspa e extintor"]);
+  if (state.scenarios.valaOleo) preventionRows.push(["GHE 01 e 03", "Vala de inspeção e troca de óleo", "Proteger bordas, manter iluminação, ventilação e piso antiderrapante, e conter derrames com material absorvente.", "Inspeção da vala e kit de contenção"]);
+  if (state.scenarios.compressor) preventionRows.push(["GHE 01", "Compressor e vaso de pressão", "Manter prontuário, inspeções, drenagem e dispositivos de segurança; proibir uso do ar comprimido para limpar o corpo.", "Inspeções da NR-13 e registro"]);
+  if (state.scenarios.lavagemCsao) preventionRows.push(["GHE 03", "Box de lavagem e CSAO", "Garantir drenagem, piso antiderrapante, conjunto impermeável e manutenção da caixa separadora de água e óleo.", "EPIs impermeáveis e inspeção da CSAO"]);
+  if (state.scenarios.borracharia) preventionRows.push(["GHE 01", "Borracharia e calibragem de pneus", "Calibrar em gaiola de contenção com mangueira de engate remoto e inspecionar aros e pneus antes da montagem.", "Gaiola, procedimento e checklist"]);
+  if (state.scenarios.baterias) preventionRows.push(["GHE 01", "Baterias automotivas", "Manusear em área ventilada, sem fontes de ignição, com bacia de contenção e lava-olhos disponível.", "Luva química, óculos e avental"]);
+  if (state.scenarios.manobraVeiculos) preventionRows.push(["GHE 01 e 04", "Circulação de veículos e gases de escape", "Segregar pedestres, sinalizar e orientar manobras; conectar exaustão à ponteira de escape durante testes.", "Alta visibilidade e inspeção de exaustores"]);
+  if (state.scenarios.abrigoResiduos) preventionRows.push(["GHE 01 e 03", "Resíduos perigosos", "Armazenar óleo usado, filtros, baterias e estopas contaminadas em abrigo identificado e com contenção; destinar por empresa licenciada.", "Inventário de resíduos e NR-25"]);
+  if (state.scenarios.eletricidade) preventionRows.push(["GHE 01", "Eletricidade", "Somente pessoal autorizado; priorizar desenergização, bloqueio e ferramentas isoladas, inclusive em veículos híbridos e elétricos.", "Controles e capacitação da NR-10"]);
+  if (state.scenarios.trabalhoAltura) preventionRows.push(["GHEs aplicáveis", "Altura", "Eliminar a exposição quando possível, planejar a atividade e adotar proteção coletiva e individual.", "Análise de risco, PT e NR-35 quando aplicáveis"]);
 
   children.push(
     heading("9. Medidas de prevenção e controle"),
@@ -491,14 +496,15 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
   );
 
   const environmentalRows: string[][] = [];
-  if (state.scenarios.ferramentas) environmentalRows.push(["Ruído e vibração", "Zeladoria e manutenção", "Avaliar ferramentas e tempo de uso; medir quando aplicável"]);
-  if (state.scenarios.areasExternas) environmentalRows.push(["Calor e intempéries", "Áreas externas", "Caracterizar exposição; quantificar calor quando o critério aplicável exigir"]);
-  if (state.scenarios.produtosQuimicos) environmentalRows.push(["Agentes químicos", "Limpeza e manutenção", "Analisar FDS, forma de uso e necessidade de avaliação específica"]);
-  if (state.scenarios.sanitariosResiduos) environmentalRows.push(["Agentes biológicos", "Limpeza", "Avaliação qualitativa da atividade, frequência e condições"]);
-  if (state.scenarios.eletricidade) environmentalRows.push(["Eletricidade", "Zeladoria e manutenção", "Avaliação qualitativa da atividade, instalações e controles"]);
-  if (state.scenarios.segurancaPatrimonial) environmentalRows.push(["Violência", "Controle patrimonial", "Caracterizar atividade e avaliar eventual enquadramento legal"]);
-  if (state.scenarios.trabalhoAltura) environmentalRows.push(["Queda de altura", "Zeladoria e manutenção", "Caracterizar atividade e controles; não presumir pelo cargo"]);
-  if (state.scenarios.garagemFechada) environmentalRows.push(["Gases de combustão", "Garagem", "Avaliar ventilação, permanência e necessidade de medição"]);
+  environmentalRows.push(["Ruído e vibração", "GHE 01, 02 e 03", "Avaliar ferramentas pneumáticas, compressores e lixadeiras; medir conforme NHO-01 e NHO-10 quando aplicável"]);
+  if (state.scenarios.cabinePintura) environmentalRows.push(["Solventes e tintas", "GHE 02", "Analisar FDS e avaliar quantitativamente os agentes químicos aplicáveis"]);
+  if (state.scenarios.soldagem) environmentalRows.push(["Fumos metálicos e radiação não ionizante", "GHE 02", "Avaliar fumos (NHO-08) e caracterizar qualitativamente a radiação da soldagem"]);
+  if (state.scenarios.produtosQuimicos) environmentalRows.push(["Agentes químicos", "GHE 02, 03 e 04", "Analisar FDS, forma de uso e necessidade de avaliação específica"]);
+  if (state.scenarios.lavagemCsao) environmentalRows.push(["Umidade e agentes alcalinos", "GHE 03", "Avaliação qualitativa da atividade, frequência e neutralização por EPI"]);
+  if (state.scenarios.manobraVeiculos) environmentalRows.push(["Gases de escape", "GHE 01 e 04", "Avaliar ventilação, permanência e necessidade de medição"]);
+  if (state.scenarios.baterias) environmentalRows.push(["Ácido sulfúrico e chumbo", "GHE 01", "Avaliação qualitativa do manuseio e dos controles"]);
+  if (state.scenarios.eletricidade) environmentalRows.push(["Eletricidade", "GHE 01", "Avaliação qualitativa da atividade, instalações e controles"]);
+  if (state.scenarios.trabalhoAltura) environmentalRows.push(["Queda de altura", "GHEs aplicáveis", "Caracterizar atividade e controles; não presumir pelo cargo"]);
   children.push(
     environmentalRows.length
       ? dataTable(["Agente ou situação", "GHE ou área", "Estratégia"], environmentalRows, [25, 27, 48])
@@ -508,11 +514,15 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
     dataTable(
       ["Situação", "Diretriz preliminar"],
       [
-        ...(state.scenarios.sanitariosResiduos ? [["Sanitários e resíduos", "Avaliar qualitativamente as condições e os critérios aplicáveis da NR-15"]] : []),
+        ["Ruído, vibração e fumos", "Avaliar quantitativamente; o enquadramento depende dos limites e dos critérios das NR-15"],
+        ...(state.scenarios.cabinePintura ? [["Solventes e tintas", "Avaliar agentes, concentração, forma e tempo de exposição"]] : []),
+        ...(state.scenarios.lavagemCsao ? [["Umidade e produtos alcalinos", "Avaliar qualitativamente as condições e os critérios aplicáveis da NR-15"]] : []),
+        ...(state.scenarios.baterias ? [["Baterias automotivas", "Avaliar manuseio de ácido sulfúrico e chumbo"]] : []),
+        ...(state.scenarios.abrigoResiduos ? [["Resíduos perigosos", "Avaliar manejo de óleos usados e produtos contaminados"]] : []),
         ...(state.scenarios.produtosQuimicos ? [["Produtos químicos", "Avaliar agentes, concentração, forma e tempo de exposição"]] : []),
-        ...(state.scenarios.segurancaPatrimonial ? [["Segurança patrimonial", "Verificar a atividade e os requisitos aplicáveis da NR-16"]] : []),
+        ...(state.scenarios.cabinePintura ? [["Inflamáveis e combustíveis", "Verificar armazenamento e manuseio quanto aos requisitos aplicáveis da NR-16 e da NR-20"]] : []),
         ...(state.scenarios.eletricidade ? [["Eletricidade", "Avaliar atividade, instalações, autorização e controles"]] : []),
-        ...(state.scenarios.garagemFechada ? [["Garagem", "Avaliar veículos, ventilação, ruído e gases"]] : []),
+        ...(state.scenarios.manobraVeiculos ? [["Gases de escape", "Avaliar ventilação, permanência e gases de combustão"]] : []),
         ["Demais funções", "Sem enquadramento automático; confirmar em campo"],
       ],
       [35, 65],
@@ -527,7 +537,7 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
     addConditionalStatement(
       state.scenarios.eletricidade,
       "Foi informada intervenção em eletricidade. A atividade deve ser restrita a trabalhadores autorizados e capacitados, com aplicação das medidas de desenergização, bloqueio, verificação, ferramentas e EPIs pertinentes.",
-      "Não foi informada intervenção rotineira em instalações elétricas. Porteiros, trabalhadores da limpeza e pessoas não autorizadas não devem executar esse tipo de atividade.",
+      "Não foi informada intervenção rotineira em instalações elétricas. Mecânicos sem autorização, lavadores, trabalhadores da limpeza e pessoas não capacitadas não devem executar esse tipo de atividade.",
     ),
     heading("16. Produtos químicos e FDS"),
     addConditionalStatement(
@@ -538,7 +548,7 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
     heading("17. Proteção contra incêndios e emergências"),
     addConditionalStatement(
       state.scenarios.incendioEmergencia,
-      "A equipe deve conhecer rotas de fuga, comunicação, abandono e meios de emergência, mantendo saídas desobstruídas e integrando os procedimentos ao plano do condomínio e à legislação aplicável.",
+      "A equipe deve conhecer rotas de fuga, comunicação, abandono e meios de emergência, mantendo saídas desobstruídas e integrando os procedimentos ao plano de emergência da oficina (incêndio em inflamáveis, derrames de óleo e produtos químicos, e acidentes com máquinas) e à legislação aplicável.",
       "A integração ao plano de emergência não foi marcada. Essa condição deve ser revista, pois todos os trabalhadores precisam receber orientações compatíveis com o estabelecimento.",
     ),
     heading("18. Atividades não rotineiras e terceiros"),
@@ -558,17 +568,23 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
   if (state.scenarios.produtosQuimicos) trainingRows.push(["Produtos químicos e FDS", "Limpeza e manutenção", "Admissão e introdução de novos produtos"]);
   if (state.scenarios.eletricidade) trainingRows.push(["NR-10", "Trabalhadores autorizados", "Conforme requisitos aplicáveis"]);
   if (state.scenarios.trabalhoAltura) trainingRows.push(["NR-35", "Trabalhadores autorizados", "Conforme requisitos aplicáveis"]);
-  if (state.scenarios.segurancaPatrimonial) trainingRows.push(["Procedimentos de segurança patrimonial", "Controle patrimonial e portaria quando aplicável", "Admissão e reciclagens internas"]);
+  if (state.scenarios.elevadores) trainingRows.push(["Operação segura de elevadores e macacos (NR-12)", "GHE 01", "Admissão e reciclagens internas"]);
+  if (state.scenarios.compressor) trainingRows.push(["Operação de compressor e vaso de pressão (NR-13)", "Operadores designados", "Conforme requisitos aplicáveis"]);
+  if (state.scenarios.cabinePintura) trainingRows.push(["Inflamáveis e proteção respiratória (NR-20 e NR-06)", "GHE 02", "Admissão e reciclagens"]);
+  if (state.scenarios.soldagem) trainingRows.push(["Trabalho a quente", "GHE 02", "Admissão e reciclagens"]);
   if (state.scenarios.incendioEmergencia) trainingRows.push(["Prevenção de incêndio e emergência", "Todos", "Conforme plano e legislação aplicável"]);
-  if (ghes.some((ghe) => ghe.id !== "GHE 01")) trainingRows.push(["DDS", "Equipes operacionais", "Periodicidade definida pela gestão"]);
+  if (ghes.some((ghe) => ghe.id !== "GHE 04")) trainingRows.push(["DDS", "Equipes operacionais", "Periodicidade definida pela gestão"]);
 
   const inspectionRows: string[][] = [
     ["EPIs", "Mensal e rotina", "Checklist e ficha de EPI"],
-    ["Pisos, escadas e rotas", "Mensal", "Checklist predial"],
+    ["Pisos, escadas e rotas", "Mensal", "Checklist de inspeção"],
     ["Ações do PGR", "Mensal ou trimestral", "Plano de ação atualizado"],
   ];
   if (state.scenarios.produtosQuimicos) inspectionRows.push(["Produtos químicos", "Mensal e a cada novo produto", "Inventário e FDS"]);
-  if (state.scenarios.ferramentas) inspectionRows.push(["Ferramentas e equipamentos", "Antes do uso e periodicamente", "Checklist"]);
+  inspectionRows.push(["Ferramentas e equipamentos", "Antes do uso e periodicamente", "Checklist"]);
+  if (state.scenarios.elevadores) inspectionRows.push(["Elevadores, macacos e cavaletes", "Antes do uso e periodicamente", "Checklist e registro de manutenção"]);
+  if (state.scenarios.compressor) inspectionRows.push(["Compressor e vaso de pressão", "Conforme NR-13", "Prontuário e relatório"]);
+  if (state.scenarios.cabinePintura) inspectionRows.push(["Exaustão e filtros da cabine", "Mensal", "Checklist e relatório"]);
   if (state.scenarios.trabalhoAltura) inspectionRows.push(["Trabalho em altura", "Antes de cada serviço", "AR, PT e inspeção"]);
   if (state.scenarios.eletricidade) inspectionRows.push(["Instalações elétricas", "Conforme plano de manutenção", "Registro técnico"]);
   if (state.scenarios.incendioEmergencia) inspectionRows.push(["Extintores e rotas de fuga", "Conforme plano e legislação", "Checklist e relatório"]);
@@ -663,8 +679,8 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
   return new Document({
     creator: text(state.technicalResponsible, "BIOSAFE"),
     title: `Programa de Gerenciamento de Riscos – ${text(state.condoName)}`,
-    subject: "Programa de Gerenciamento de Riscos para serviços terceirizados em condomínio",
-    description: "PGR configurado a partir da matriz-base para condomínios e edificações prontas.",
+    subject: "Programa de Gerenciamento de Riscos para oficina mecânica e centro automotivo",
+    description: "PGR configurado a partir da matriz-base para oficinas mecânicas e centros automotivos.",
     styles: {
       default: {
         document: {
@@ -720,13 +736,13 @@ export function buildPgrDocument(state: PgrState, nr01Report?: Nr01Report, logoD
 }
 
 export function makePgrFilename(state: PgrState) {
-  const base = text(state.condoName, "condominio")
+  const base = text(state.condoName, "oficina")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .toLowerCase();
-  return `PGR-${base || "condominio"}.docx`;
+  return `PGR-${base || "oficina"}.docx`;
 }
 
 export async function downloadPgrDocx(state: PgrState, nr01Report?: Nr01Report) {

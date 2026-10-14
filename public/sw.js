@@ -1,4 +1,4 @@
-const CACHE_NAME = "gerador-sst-github-v5";
+const CACHE_NAME = "gerador-sst-oficina-v1";
 const APP_URL = new URL("./", self.registration.scope).toString();
 const APP_SHELL = [
   APP_URL,

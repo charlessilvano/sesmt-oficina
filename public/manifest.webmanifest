@@ -1,6 +1,6 @@
 {
-  "name": "Gerador de SST para Condomínios",
-  "short_name": "Gerador SST",
+  "name": "Gerador de SST - Oficinas",
+  "short_name": "SST Oficina",
   "description": "Configure riscos, analise a NR-01 e gere PGR, PCMSO e LTCAT em Word.",
   "lang": "pt-BR",
   "start_url": "./",
