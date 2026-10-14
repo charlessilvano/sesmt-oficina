@@ -1,4 +1,4 @@
-name: Publicar no GitHub Pages
+name: Publicar Direto no GitHub Pages
 
 on:
   push:
